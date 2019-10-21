@@ -1,7 +1,7 @@
 package io.blockchainetl.anomaloustransactions.domain;
 
 import com.google.common.base.Objects;
-import io.blockchainetl.anomaloustransactions.domain.ethereum.Transaction;
+import io.blockchainetl.anomaloustransactions.domain.bitcoin.Transaction;
 import org.apache.avro.reflect.Nullable;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.coders.DefaultCoder;
@@ -10,10 +10,10 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 @DefaultCoder(AvroCoder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AnomalousEtherValueMessage {
+public class AnomalousBitcoinValueMessage {
 
     @Nullable
-    private String type = "anomalous_ether_value";
+    private String type = "anomalous_bitcoin_value";
 
     @Nullable
     private Transaction transaction;

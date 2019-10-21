@@ -1,4 +1,4 @@
-package io.blockchainetl.anomaloustransactions.domain;
+package io.blockchainetl.anomaloustransactions.domain.ethereum;
 
 import com.google.common.base.Objects;
 import org.apache.avro.reflect.Nullable;

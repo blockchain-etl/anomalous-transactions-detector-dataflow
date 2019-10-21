@@ -10,11 +10,17 @@ import org.apache.beam.runners.dataflow.options.DataflowWorkerHarnessOptions;
 public interface AnomalousTransactionsPipelineOptions extends PipelineOptions, StreamingOptions, SdkHarnessOptions,
     DataflowWorkerHarnessOptions {
 
-    @Description("Input PubSub subscription")
+    @Description("Input PubSub subscription for Ethereum Transactions")
     @Validation.Required
-    String getInputSubscription();
+    String getEthereumTransactionsSubscription();
 
-    void setInputSubscription(String value);
+    void setEthereumTransactionsSubscription(String value);
+
+    @Description("Input PubSub subscription for Bitcoin Transactions")
+    @Validation.Required
+    String getBitcoinTransactionsSubscription();
+
+    void setBitcoinTransactionsSubscription(String value);
     
     @Description("Output PubSub topic")
     @Validation.Required

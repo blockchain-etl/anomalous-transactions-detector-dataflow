@@ -2,7 +2,7 @@ package io.blockchainetl.anomaloustransactions.fns;
 
 import io.blockchainetl.anomaloustransactions.Constants;
 import io.blockchainetl.anomaloustransactions.domain.AnomalousEtherValueMessage;
-import io.blockchainetl.anomaloustransactions.domain.Transaction;
+import io.blockchainetl.anomaloustransactions.domain.ethereum.Transaction;
 import org.apache.beam.sdk.values.PCollectionView;
 
 import java.math.BigInteger;

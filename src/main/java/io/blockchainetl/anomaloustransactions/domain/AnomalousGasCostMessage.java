@@ -1,6 +1,7 @@
 package io.blockchainetl.anomaloustransactions.domain;
 
 import com.google.common.base.Objects;
+import io.blockchainetl.anomaloustransactions.domain.ethereum.Transaction;
 import org.apache.avro.reflect.Nullable;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.coders.DefaultCoder;

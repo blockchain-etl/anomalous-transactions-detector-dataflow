@@ -1,7 +1,7 @@
 package io.blockchainetl;
 
-import io.blockchainetl.anomaloustransactions.AnomalousTransactionsPipeline;
 import io.blockchainetl.anomaloustransactions.Constants;
+import io.blockchainetl.anomaloustransactions.EthereumPipeline;
 import io.blockchainetl.anomaloustransactions.TestUtils;
 import io.blockchainetl.anomaloustransactions.service.BigQueryService;
 import io.blockchainetl.anomaloustransactions.service.BigQueryServiceHolder;
@@ -33,19 +33,24 @@ public class AnomalousTransactionsPipelineTest {
         BigQueryServiceHolder.INSTANCE = new BigQueryService() {
             @Override
             public BigInteger getEtherValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
-                return Constants.ONE_ETHER_IN_WEI;
+                return Constants.WEI_IN_ONE_ETHER;
             }
 
             @Override
-            public BigInteger getGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+            public BigInteger getEtherGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
                 return new BigInteger("2600000000000000");
+            }
+
+            @Override
+            public BigInteger getBitcoinInputValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+                return new BigInteger("100000000000");
             }
         };
     }
     
     @Test
     @Category(ValidatesRunner.class)
-    public void testEtherValue() throws Exception {
+    public void testEthereumPipeline() throws Exception {
         testTemplate(
             "testdata/ethereumBlock1000000Transactions.json",
             "testdata/ethereumBlock1000000TransactionsExpected.json"
@@ -56,7 +61,7 @@ public class AnomalousTransactionsPipelineTest {
         List<String> blockchainData = TestUtils.readLines(inputFile);
         PCollection<String> input = p.apply("Input", Create.of(blockchainData));
 
-        PCollection<String> output = AnomalousTransactionsPipeline.buildPipeline(p, input);
+        PCollection<String> output = EthereumPipeline.buildEthereumPipeline(p, input);
 
         TestUtils.logPCollection(output);
 
