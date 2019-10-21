@@ -24,7 +24,7 @@ public class BigQueryServiceImpl implements BigQueryService {
     private static final BigInteger DEFAULT_BITCOIN_VALUE_THRESHOLD = new BigInteger("10000").multiply(SATOSHI_IN_ONE_BITCOIN);
 
     @Override
-    public BigInteger getEtherValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+    public BigInteger getEthereumValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
         String query = String.format("select value\n"
             + "from `bigquery-public-data.crypto_ethereum.transactions` as t\n"
             + "where DATE(block_timestamp) > DATE_ADD(CURRENT_DATE() , INTERVAL -%s DAY)\n"
@@ -39,7 +39,7 @@ public class BigQueryServiceImpl implements BigQueryService {
     }
 
     @Override
-    public BigInteger getEtherGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+    public BigInteger getEthereumGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
         String query = String.format("select gas_price * receipt_gas_used as gas_cost\n"
             + "from `bigquery-public-data.crypto_ethereum.transactions` as t\n"
             + "where DATE(block_timestamp) > DATE_ADD(CURRENT_DATE() , INTERVAL -%s DAY)\n"
@@ -54,7 +54,7 @@ public class BigQueryServiceImpl implements BigQueryService {
     }
 
     @Override
-    public BigInteger getBitcoinInputValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+    public BigInteger getBitcoinValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
         String query = String.format("select input_value\n"
             + "from `bigquery-public-data.crypto_bitcoin.transactions` as t\n"
             + "where DATE(block_timestamp) > DATE_ADD(CURRENT_DATE() , INTERVAL -%s DAY)\n"

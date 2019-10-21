@@ -44,7 +44,7 @@ public class AnomalousTransactionsPipeline {
 
         PCollection<String> bitcoinTransactionsInput = p.apply("ReadBitcoinTransactionsFromPubSub",
             PubsubIO.readStrings()
-                .fromSubscription(options.getEthereumTransactionsSubscription())
+                .fromSubscription(options.getBitcoinTransactionsSubscription())
                 .withIdAttribute(PUBSUB_ID_ATTRIBUTE));
         
         PCollection<String> bitcoinOutput = BitcoinPipeline.buildBitcoinPipeline(p, bitcoinTransactionsInput);

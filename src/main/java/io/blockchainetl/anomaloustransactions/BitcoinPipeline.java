@@ -20,9 +20,9 @@ import java.math.BigInteger;
 public class BitcoinPipeline {
 
     public static PCollection<String> buildBitcoinPipeline(Pipeline p, PCollection<String> input) {
-        PCollectionView<BigInteger> bitcoinValueThreshold = bitcoinInputValueThreshold(p);
-        PCollection<String> bitcoinValueOutput = buildFilterBitcoinPipeline("BitcoinInputValue", bitcoinValueThreshold,
-            new FilterByBitcoinValueFn(bitcoinValueThreshold), input);
+        PCollectionView<BigInteger> valueThreshold = valueThreshold(p);
+        PCollection<String> bitcoinValueOutput = buildFilterBitcoinPipeline("BitcoinValue", valueThreshold,
+            new FilterByBitcoinValueFn(valueThreshold), input);
 
         return bitcoinValueOutput;
     }
@@ -54,11 +54,11 @@ public class BitcoinPipeline {
         return filteredTransactions.apply(prefix + "EncodeToJson", ParDo.of(new EncodeToJsonFn()));
     }
 
-    private static PCollectionView<BigInteger> bitcoinInputValueThreshold(Pipeline p) {
+    private static PCollectionView<BigInteger> valueThreshold(Pipeline p) {
         return DataflowUtils.getPCollectionViewForValue(p, "BitcoinInputValue", new DoFn<Long, BigInteger>() {
                 @ProcessElement
                 public void process(@Element Long input, OutputReceiver<BigInteger> o) {
-                    o.output(BigQueryServiceHolder.INSTANCE.getBitcoinInputValueThreshold(
+                    o.output(BigQueryServiceHolder.INSTANCE.getBitcoinValueThreshold(
                         Constants.NUMBER_OF_TRANSACTIONS_ABOVE_THRESHOLD, Constants.PERIOD_IN_DAYS));
                 }
             }

@@ -1,29 +1,29 @@
 package io.blockchainetl.anomaloustransactions.fns;
 
 import io.blockchainetl.anomaloustransactions.Constants;
-import io.blockchainetl.anomaloustransactions.domain.AnomalousBitcoinValueMessage;
+import io.blockchainetl.anomaloustransactions.domain.BitcoinAnomalousValueMessage;
 import io.blockchainetl.anomaloustransactions.domain.bitcoin.Transaction;
 import org.apache.beam.sdk.values.PCollectionView;
 
 import java.math.BigInteger;
 
-public class FilterByBitcoinValueFn extends ErrorHandlingDoFn<Transaction, AnomalousBitcoinValueMessage> {
+public class FilterByBitcoinValueFn extends ErrorHandlingDoFn<Transaction, BitcoinAnomalousValueMessage> {
 
-    private final PCollectionView<BigInteger> bitcoinInputValueThresholdSideInput;
+    private final PCollectionView<BigInteger> bitcoinValueThresholdSideInput;
 
-    public FilterByBitcoinValueFn(PCollectionView<BigInteger> bitcoinInputValueThresholdSideInput) {
-        this.bitcoinInputValueThresholdSideInput = bitcoinInputValueThresholdSideInput;
+    public FilterByBitcoinValueFn(PCollectionView<BigInteger> bitcoinValueThresholdSideInput) {
+        this.bitcoinValueThresholdSideInput = bitcoinValueThresholdSideInput;
     }
 
     @Override
     protected void doProcessElement(ProcessContext c) {
-        BigInteger bitcoinInputValueThreshold = c.sideInput(this.bitcoinInputValueThresholdSideInput);
+        BigInteger bitcoinValueThreshold = c.sideInput(this.bitcoinValueThresholdSideInput);
 
         Transaction transaction = c.element();
         BigInteger value = transaction.getInputValue();
 
-        if (value.compareTo(bitcoinInputValueThreshold) >= 0) {
-            AnomalousBitcoinValueMessage message = new AnomalousBitcoinValueMessage();
+        if (value != null && value.compareTo(bitcoinValueThreshold) >= 0) {
+            BitcoinAnomalousValueMessage message = new BitcoinAnomalousValueMessage();
 
             message.setTransaction(transaction);
             message.setNumberOfTransactionsAboveThreshold(Constants.NUMBER_OF_TRANSACTIONS_ABOVE_THRESHOLD);

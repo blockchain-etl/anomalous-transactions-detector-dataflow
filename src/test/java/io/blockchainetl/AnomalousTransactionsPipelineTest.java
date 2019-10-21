@@ -32,17 +32,17 @@ public class AnomalousTransactionsPipelineTest {
     public void init() {
         BigQueryServiceHolder.INSTANCE = new BigQueryService() {
             @Override
-            public BigInteger getEtherValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+            public BigInteger getEthereumValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
                 return Constants.WEI_IN_ONE_ETHER;
             }
 
             @Override
-            public BigInteger getEtherGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+            public BigInteger getEthereumGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
                 return new BigInteger("2600000000000000");
             }
 
             @Override
-            public BigInteger getBitcoinInputValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+            public BigInteger getBitcoinValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
                 return new BigInteger("100000000000");
             }
         };

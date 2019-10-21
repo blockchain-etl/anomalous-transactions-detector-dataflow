@@ -12,10 +12,10 @@ import java.math.BigInteger;
 
 @DefaultCoder(AvroCoder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AnomalousGasCostMessage {
+public class EthereumAnomalousGasCostMessage {
 
     @Nullable
-    private String type = "anomalous_gas_cost";
+    private String type = "ethereum_anomalous_gas_cost";
 
     @Nullable
     private Transaction transaction;

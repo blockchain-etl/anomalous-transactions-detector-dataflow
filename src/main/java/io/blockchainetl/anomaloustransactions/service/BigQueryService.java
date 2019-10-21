@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public interface BigQueryService {
 
-    BigInteger getEtherValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays);
-    BigInteger getEtherGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays);
-    BigInteger getBitcoinInputValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays);
+    BigInteger getEthereumValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays);
+    BigInteger getEthereumGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays);
+    BigInteger getBitcoinValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays);
 }

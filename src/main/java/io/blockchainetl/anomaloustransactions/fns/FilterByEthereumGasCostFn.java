@@ -1,17 +1,17 @@
 package io.blockchainetl.anomaloustransactions.fns;
 
 import io.blockchainetl.anomaloustransactions.Constants;
-import io.blockchainetl.anomaloustransactions.domain.AnomalousGasCostMessage;
+import io.blockchainetl.anomaloustransactions.domain.EthereumAnomalousGasCostMessage;
 import io.blockchainetl.anomaloustransactions.domain.ethereum.Transaction;
 import org.apache.beam.sdk.values.PCollectionView;
 
 import java.math.BigInteger;
 
-public class FilterByGasCostFn extends ErrorHandlingDoFn<Transaction, AnomalousGasCostMessage> {
+public class FilterByEthereumGasCostFn extends ErrorHandlingDoFn<Transaction, EthereumAnomalousGasCostMessage> {
 
     private final PCollectionView<BigInteger> gasCostThresholdSideInput;
 
-    public FilterByGasCostFn(PCollectionView<BigInteger> gasCostThresholdSideInput) {
+    public FilterByEthereumGasCostFn(PCollectionView<BigInteger> gasCostThresholdSideInput) {
         this.gasCostThresholdSideInput = gasCostThresholdSideInput;
     }
 
@@ -25,7 +25,7 @@ public class FilterByGasCostFn extends ErrorHandlingDoFn<Transaction, AnomalousG
         BigInteger gasCost = gasPrice.multiply(BigInteger.valueOf(gasUsed));
 
         if (gasCost.compareTo(gasCostThreshold) >= 0) {
-            AnomalousGasCostMessage message = new AnomalousGasCostMessage();
+            EthereumAnomalousGasCostMessage message = new EthereumAnomalousGasCostMessage();
 
             message.setTransaction(transaction);
             message.setNumberOfTransactionsAboveThreshold(Constants.NUMBER_OF_TRANSACTIONS_ABOVE_THRESHOLD);
