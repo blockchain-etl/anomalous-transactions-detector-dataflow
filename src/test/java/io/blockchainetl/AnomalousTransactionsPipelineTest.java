@@ -1,10 +1,11 @@
 package io.blockchainetl;
 
-import io.blockchainetl.anomaloustransactions.Constants;
+import io.blockchainetl.anomaloustransactions.BitcoinPipeline;
 import io.blockchainetl.anomaloustransactions.EthereumPipeline;
 import io.blockchainetl.anomaloustransactions.TestUtils;
-import io.blockchainetl.anomaloustransactions.service.BigQueryService;
 import io.blockchainetl.anomaloustransactions.service.BigQueryServiceHolder;
+import io.blockchainetl.anomaloustransactions.service.BigQueryServiceMock;
+import io.blockchainetl.anomaloustransactions.utils.DataflowUtils;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.testing.ValidatesRunner;
@@ -18,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 
 
@@ -30,34 +30,29 @@ public class AnomalousTransactionsPipelineTest {
 
     @Before
     public void init() {
-        BigQueryServiceHolder.INSTANCE = new BigQueryService() {
-            @Override
-            public BigInteger getEthereumValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
-                return Constants.WEI_IN_ONE_ETHER;
-            }
-
-            @Override
-            public BigInteger getEthereumGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
-                return new BigInteger("2600000000000000");
-            }
-
-            @Override
-            public BigInteger getBitcoinValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
-                return new BigInteger("100000000000");
-            }
-        };
+        BigQueryServiceHolder.INSTANCE = new BigQueryServiceMock();
+        DataflowUtils.GENERATE_SEQUENCE_FOR_TESTING = true;
     }
-    
+
     @Test
     @Category(ValidatesRunner.class)
     public void testEthereumPipeline() throws Exception {
-        testTemplate(
+        testEthereumTemplate(
             "testdata/ethereumBlock1000000Transactions.json",
             "testdata/ethereumBlock1000000TransactionsExpected.json"
         );
     }
-    
-    private void testTemplate(String inputFile, String outputFile) throws IOException {
+
+    @Test
+    @Category(ValidatesRunner.class)
+    public void testBitcoinPipeline() throws Exception {
+        testBitcoinTemplate(
+            "testdata/bitcoinBlock600340Transactions.json",
+            "testdata/bitcoinBlock600340TransactionsExpected.json"
+        );
+    }
+
+    private void testEthereumTemplate(String inputFile, String outputFile) throws IOException {
         List<String> blockchainData = TestUtils.readLines(inputFile);
         PCollection<String> input = p.apply("Input", Create.of(blockchainData));
 
@@ -67,6 +62,19 @@ public class AnomalousTransactionsPipelineTest {
 
         PAssert.that(output).containsInAnyOrder(TestUtils.readLines(outputFile));
 
-        p.run().waitUntilFinish();  
+        p.run().waitUntilFinish();
+    }
+
+    private void testBitcoinTemplate(String inputFile, String outputFile) throws IOException {
+        List<String> blockchainData = TestUtils.readLines(inputFile);
+        PCollection<String> input = p.apply("Input", Create.of(blockchainData));
+
+        PCollection<String> output = BitcoinPipeline.buildBitcoinPipeline(p, input);
+
+        TestUtils.logPCollection(output);
+
+        PAssert.that(output).containsInAnyOrder(TestUtils.readLines(outputFile));
+
+        p.run().waitUntilFinish();
     }
 }
