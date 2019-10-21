@@ -21,7 +21,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.blockchainetl</groupId>
-  <artifactId>dataflow-anomalous-transactions</artifactId>
+  <artifactId>anomalous-transactions-detector-dataflow</artifactId>
   <version>0.1</version>
 
   <packaging>jar</packaging>

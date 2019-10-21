@@ -4,7 +4,7 @@ import io.blockchainetl.anomaloustransactions.domain.Transaction;
 import io.blockchainetl.anomaloustransactions.fns.AddTimestampsFn;
 import io.blockchainetl.anomaloustransactions.fns.EncodeToJsonFn;
 import io.blockchainetl.anomaloustransactions.fns.FilterByEtherValueFn;
-import io.blockchainetl.anomaloustransactions.fns.FilterByGasPriceFn;
+import io.blockchainetl.anomaloustransactions.fns.FilterByGasCostFn;
 import io.blockchainetl.anomaloustransactions.fns.LogElementsFn;
 import io.blockchainetl.anomaloustransactions.fns.ParseEntitiesFromJsonFn;
 import io.blockchainetl.anomaloustransactions.service.BigQueryServiceHolder;
@@ -65,7 +65,7 @@ public class AnomalousTransactionsPipeline {
         // Write output
 
         output
-            .apply("LogElements", ParDo.of(new LogElementsFn<>("LargeTransactionMessage: ")))
+            .apply("LogElements", ParDo.of(new LogElementsFn<>("Message: ")))
             .apply("WriteElements", PubsubIO.writeStrings().to(options.getOutputTopic()));
 
         // Run pipeline
@@ -80,13 +80,13 @@ public class AnomalousTransactionsPipeline {
         PCollection<String> etherValueOutput = buildFilterPipeline("EtherValue", etherValueThreshold, 
             new FilterByEtherValueFn(etherValueThreshold), input);
 
-        PCollectionView<BigInteger> gasPriceThreshold = gasPriceThreshold(p);
-        PCollection<String> gasPriceOutput = buildFilterPipeline("GasPrice", gasPriceThreshold,
-            new FilterByGasPriceFn(gasPriceThreshold), input);
+        PCollectionView<BigInteger> gasCostThreshold = gasCostThreshold(p);
+        PCollection<String> gasCostOutput = buildFilterPipeline("GasCost", gasCostThreshold,
+            new FilterByGasCostFn(gasCostThreshold), input);
 
         // Combine 
 
-        PCollectionList<String> outputs = PCollectionList.of(etherValueOutput).and(gasPriceOutput);
+        PCollectionList<String> outputs = PCollectionList.of(etherValueOutput).and(gasCostOutput);
         return outputs.apply("Flatten", Flatten.pCollections());
     }
 
@@ -140,24 +140,24 @@ public class AnomalousTransactionsPipeline {
         return etherValueThreshold;
     }
 
-    public static PCollectionView<BigInteger> gasPriceThreshold(Pipeline p) {
-        PCollectionView<BigInteger> gasPriceThreshold =
-            p.apply("GenerateSequenceForGasPrice", GenerateSequence.from(0).withRate(1, Duration.standardHours(24L)))
-                .apply("WindowForGasPrice", Window.<Long>into(new GlobalWindows())
+    public static PCollectionView<BigInteger> gasCostThreshold(Pipeline p) {
+        PCollectionView<BigInteger> gasCostThreshold =
+            p.apply("GenerateSequenceForGasCost", GenerateSequence.from(0).withRate(1, Duration.standardHours(24L)))
+                .apply("WindowForGasCost", Window.<Long>into(new GlobalWindows())
                     .triggering(Repeatedly.forever(AfterProcessingTime.pastFirstElementInPane()))
                     .discardingFiredPanes()
                 )
-                .apply("QueryGasPrice",
+                .apply("QueryGasCost",
                     ParDo.of(
                         new DoFn<Long, BigInteger>() {
 
                             @ProcessElement
                             public void process(@Element Long input, DoFn.OutputReceiver<BigInteger> o) {
-                                o.output(BigQueryServiceHolder.INSTANCE.getGasPriceThreshold(
+                                o.output(BigQueryServiceHolder.INSTANCE.getGasCostThreshold(
                                     Constants.NUMBER_OF_TRANSACTIONS_ABOVE_THRESHOLD, Constants.PERIOD_IN_DAYS));
                             }
                         }))
-                .apply("SingletonForGasPrice", View.asSingleton());
-        return gasPriceThreshold;
+                .apply("SingletonForGasCost", View.asSingleton());
+        return gasCostThreshold;
     }
 }

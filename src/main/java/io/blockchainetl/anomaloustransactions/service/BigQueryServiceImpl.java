@@ -19,7 +19,7 @@ public class BigQueryServiceImpl implements BigQueryService {
     private static final Logger LOG = LoggerFactory.getLogger(BigQueryServiceImpl.class);
     
     private static final BigInteger DEFAULT_ETHER_VALUE_THRESHOLD = new BigInteger("1000").multiply(ONE_ETHER_IN_WEI);
-    private static final BigInteger DEFAULT_GAS_PRICE_THRESHOLD = new BigInteger("20000000000000");
+    private static final BigInteger DEFAULT_GAS_COST_THRESHOLD = new BigInteger("10").multiply(ONE_ETHER_IN_WEI);
 
     @Override
     public BigInteger getEtherValueThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
@@ -55,11 +55,11 @@ public class BigQueryServiceImpl implements BigQueryService {
     }
 
     @Override
-    public BigInteger getGasPriceThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
-        String query = String.format("select gas_price\n"
+    public BigInteger getGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+        String query = String.format("select gas_price * receipt_gas_used as gas_cost\n"
             + "from `bigquery-public-data.crypto_ethereum.transactions` as t\n"
             + "where DATE(block_timestamp) > DATE_ADD(CURRENT_DATE() , INTERVAL -%s DAY)\n"
-            + "order by gas_price desc\n"
+            + "order by gas_cost desc\n"
             + "limit %s", periodInDays, numberOfTransactionsAboveThreshold);
 
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query).build();
@@ -75,14 +75,14 @@ public class BigQueryServiceImpl implements BigQueryService {
 
         LOG.info("Got results with size: " + tableResult.getTotalRows());
 
-        BigInteger result = getLastValueFromTableResult(tableResult, "gas_price");
+        BigInteger result = getLastValueFromTableResult(tableResult, "gas_cost");
 
         if (result == null) {
             LOG.info("No rows in BigQuery results. Using default value.");
-            result = DEFAULT_GAS_PRICE_THRESHOLD;
+            result = DEFAULT_GAS_COST_THRESHOLD;
         }
 
-        LOG.info("Gas price threshold is: " + result.toString());
+        LOG.info("Gas cost threshold is: " + result.toString());
 
         return result;
     }

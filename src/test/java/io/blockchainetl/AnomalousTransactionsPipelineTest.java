@@ -37,8 +37,8 @@ public class AnomalousTransactionsPipelineTest {
             }
 
             @Override
-            public BigInteger getGasPriceThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
-                return new BigInteger("90000000000");
+            public BigInteger getGasCostThreshold(Integer numberOfTransactionsAboveThreshold, Integer periodInDays) {
+                return new BigInteger("2600000000000000");
             }
         };
     }

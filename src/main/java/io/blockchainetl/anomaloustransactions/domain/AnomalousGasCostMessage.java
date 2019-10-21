@@ -7,15 +7,21 @@ import org.apache.beam.sdk.coders.DefaultCoder;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.math.BigInteger;
+
 @DefaultCoder(AvroCoder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AnomalousGasPriceMessage {
+public class AnomalousGasCostMessage {
 
     @Nullable
-    private String type = "anomalous_gas_price";
+    private String type = "anomalous_gas_cost";
 
     @Nullable
     private Transaction transaction;
+
+    @Nullable
+    @JsonProperty("gas_cost")
+    private BigInteger gasCost;
 
     @Nullable
     @JsonProperty("period_in_days")
@@ -41,6 +47,14 @@ public class AnomalousGasPriceMessage {
         this.transaction = transaction;
     }
 
+    public BigInteger getGasCost() {
+        return gasCost;
+    }
+
+    public void setGasCost(BigInteger gasCost) {
+        this.gasCost = gasCost;
+    }
+
     public Integer getPeriodInDays() {
         return periodInDays;
     }
@@ -62,8 +76,9 @@ public class AnomalousGasPriceMessage {
         return Objects.toStringHelper(this)
             .add("type", type)
             .add("transaction", transaction)
+            .add("gasCost", gasCost)
             .add("periodInDays", periodInDays)
-            .add("numberOfTransactionAboveThreshold", numberOfTransactionsAboveThreshold)
+            .add("numberOfTransactionsAboveThreshold", numberOfTransactionsAboveThreshold)
             .toString();
     }
 }
