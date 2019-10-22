@@ -58,8 +58,9 @@ public class BigQueryServiceImpl implements BigQueryService {
         String query = String.format("select input_value\n"
             + "from `bigquery-public-data.crypto_bitcoin.transactions` as t\n"
             + "where DATE(block_timestamp) > DATE_ADD(CURRENT_DATE() , INTERVAL -%s DAY)\n"
+            + "and block_timestamp_month >= DATE_TRUNC(DATE_ADD(CURRENT_DATE(), INTERVAL -%s DAY), MONTH)"
             + "order by input_value desc\n"
-            + "limit %s", periodInDays, numberOfTransactionsAboveThreshold);
+            + "limit %s", periodInDays, numberOfTransactionsAboveThreshold, numberOfTransactionsAboveThreshold);
 
         BigInteger result = getLastValueFromQuery(query, "input_value", DEFAULT_BITCOIN_VALUE_THRESHOLD);
 
